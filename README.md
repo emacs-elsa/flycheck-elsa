@@ -1,6 +1,6 @@
 # flycheck-elsa - Flycheck for Elsa
 
-Integration of [Elsa](https://github.com/Fuco1/Elsa) into [Flycheck](https://github.com/flycheck/flycheck).
+Integration of [Elsa](https://github.com/emacs-elsa/Elsa) into [Flycheck](https://github.com/flycheck/flycheck).
 
 # Installation
 
