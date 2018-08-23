@@ -76,5 +76,11 @@ listed as a dependency."
    (info line-start line ":" column ":notice:" (message)))
   :modes (emacs-lisp-mode))
 
+;;;###autoload
+(defun flycheck-elsa-setup ()
+  "Setup Flycheck with Elsa."
+  (interactive)
+  (add-to-list 'flycheck-checkers 'emacs-lisp-elsa))
+
 (provide 'flycheck-elsa)
 ;;; flycheck-elsa.el ends here
