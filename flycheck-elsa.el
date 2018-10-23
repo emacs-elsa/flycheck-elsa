@@ -65,7 +65,7 @@ listed as a dependency."
     default-directory))
 
 (flycheck-define-checker emacs-lisp-elsa
-  "Checker for PHPStan"
+  "An Emacs Lisp checker using Elsa"
   :command ("cask" "exec" "elsa" source)
   :working-directory flycheck-elsa--working-directory
   :predicate flycheck-elsa--enable-p
