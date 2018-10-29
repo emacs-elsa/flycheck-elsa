@@ -61,7 +61,8 @@ listed as a dependency."
 (defun flycheck-elsa--working-directory (&rest _)
   "Return the working directory where the checker should run."
   (if (buffer-file-name)
-      (file-name-directory (locate-dominating-file (buffer-file-name) "Cask"))
+      (when-let (file (locate-dominating-file (buffer-file-name) "Cask"))
+        (file-name-directory file))
     default-directory))
 
 (flycheck-define-checker emacs-lisp-elsa
