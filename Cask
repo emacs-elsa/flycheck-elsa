@@ -8,4 +8,5 @@
 (depends-on "emacs" "25")
 
 (development
+ (depends-on "trinary" "0.0.1")
  (depends-on "elsa" "0.0.1"))
