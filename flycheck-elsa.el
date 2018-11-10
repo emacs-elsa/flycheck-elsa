@@ -97,25 +97,30 @@ If value is a list of strings, it will be passed unchanged as the
   "Return a list of strings to start Elsa within a Cask project."
   '("cask" "exec" "elsa"))
 
+(defun flycheck-elsa--elsa-dependency-directory (library-name)
+  "Return the directory containing LIBRARY-NAME."
+  (file-name-directory (find-library-name library-name)))
+
 (defun flycheck-elsa--elsa-dependency-directories ()
   "Return a list of directories where Elsa and its dependencies are installed."
   (let ((directories (mapcar
-                      (lambda (lib)
-                        (file-name-directory (find-library-name lib)))
+                      #'flycheck-elsa--elsa-dependency-directory
                       '("elsa" "dash" "trinary" "f" "s" "flycheck"))))
     (seq-uniq directories)))
+
+(defun flycheck-elsa--elsa-command ()
+  "Return the path to elsa executable file."
+  (expand-file-name
+   "elsa"
+   (expand-file-name "bin" (flycheck-elsa--elsa-dependency-directory "elsa"))))
 
 (defun flycheck-elsa--host-command ()
   "Return a list of strings to start Emacs with Elsa.
 Elsa and its dependencies are expected to be in `load-path'."
-  `("emacs"
-    ,@flycheck-emacs-args
+  `(,(flycheck-elsa--elsa-command)
     ,@(mapcan
-       (lambda (directory) (list "-L" directory))
-       (flycheck-elsa--elsa-dependency-directories))
-    "--eval" "(require 'flycheck)"
-    "--load" "elsa"
-    "--funcall" "elsa-run"))
+       (lambda (directory) (list "--directory" directory))
+       (flycheck-elsa--elsa-dependency-directories))))
 
 (defun flycheck-elsa-command ()
   "Return a list of strings for the command to execute and its arguments.
@@ -133,7 +138,7 @@ The result depends on the variable `flycheck-elsa-command'."
   "An Emacs Lisp checker using Elsa"
   :command (;; flycheck forces us to pass a string as first argument:
             ;; https://github.com/flycheck/flycheck/issues/1515
-            "cask"
+            "emacs"
             (eval (cdr (flycheck-elsa-command)))
             source-inplace)
   :working-directory flycheck-elsa--working-directory
