@@ -118,6 +118,7 @@ If value is a list of strings, it will be passed unchanged as the
   "Return a list of strings to start Emacs with Elsa.
 Elsa and its dependencies are expected to be in `load-path'."
   `(,(flycheck-elsa--elsa-command)
+    "--directory" "."
     ,@(mapcan
        (lambda (directory) (list "--directory" directory))
        (flycheck-elsa--elsa-dependency-directories))))
