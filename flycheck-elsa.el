@@ -101,18 +101,35 @@ If value is a list of strings, it will be passed unchanged as the
   "Return the directory containing LIBRARY-NAME."
   (file-name-directory (find-library-name library-name)))
 
+(defun flycheck-elsa--elsa-directory ()
+  "Return the directory where Elsa is installed."
+  (flycheck-elsa--elsa-dependency-directory "elsa"))
+
+(defun flycheck-elsa--elsa-dependencies ()
+  "Return a list of library names, as strings, that Elsa depend upon.
+The list does not contain Emacs itself."
+  (let* ((default-directory (flycheck-elsa--elsa-directory))
+         (package-description (with-temp-buffer
+                                (dired-mode) ;; required by `package-dir-info'
+                                (package-dir-info)))
+         (dependencies (mapcar (lambda (requirement) (symbol-name (car requirement)))
+                               (package-desc-reqs package-description))))
+    (seq-remove
+     (lambda (name) (string= name "emacs"))
+     dependencies)))
+
 (defun flycheck-elsa--elsa-dependency-directories ()
   "Return a list of directories where Elsa and its dependencies are installed."
   (let ((directories (mapcar
                       #'flycheck-elsa--elsa-dependency-directory
-                      '("elsa" "dash" "trinary" "f" "s" "flycheck"))))
+                      `("elsa" ,@(flycheck-elsa--elsa-dependencies)))))
     (seq-uniq directories)))
 
 (defun flycheck-elsa--elsa-command ()
   "Return the path to elsa executable file."
   (expand-file-name
    "elsa"
-   (expand-file-name "bin" (flycheck-elsa--elsa-dependency-directory "elsa"))))
+   (expand-file-name "bin" (flycheck-elsa--elsa-directory))))
 
 (defun flycheck-elsa--host-command ()
   "Return a list of strings to start Emacs with Elsa.
