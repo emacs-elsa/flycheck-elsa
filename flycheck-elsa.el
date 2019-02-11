@@ -72,9 +72,9 @@ listed as a dependency."
   :predicate flycheck-elsa--enable-p
   :error-filter flycheck-increment-error-columns
   :error-patterns
-  ((error line-start line ":" column ":error:" (message))
-   (warning line-start line ":" column ":warning:" (message))
-   (info line-start line ":" column ":notice:" (message)))
+  ((error line-start (file-name) ":"  line ":" column ":error:" (message))
+   (warning line-start (file-name) ":" line ":" column ":warning:" (message))
+   (info line-start (file-name) ":" line ":" column ":notice:" (message)))
   :modes (emacs-lisp-mode))
 
 ;;;###autoload
