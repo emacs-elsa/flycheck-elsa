@@ -6,7 +6,7 @@
 ;; Maintainer: Matúš Goljer <matus.goljer@gmail.com>
 ;; Version: 1.0.0
 ;; Created: 23rd August 2018
-;; Package-requires: ((emacs "25") (seq "2.0") (cask "0.8.4"))
+;; Package-requires: ((emacs "25.1") (seq "2.0") (cask "0.8.4"))
 ;; Keywords: convenience
 ;; Homepage: https://github.com/emacs-elsa/flycheck-elsa
 
@@ -39,9 +39,7 @@
   :group 'flycheck
   :link '(url-link :tag "Github" "https://github.com/emacs-elsa/flycheck-elsa"))
 
-(defcustom flycheck-elsa-ignored-files-regexps '(
-                                                 "\\`Cask\\'"
-                                                 )
+(defcustom flycheck-elsa-ignored-files-regexps '("\\`Cask\\'")
   "List of regular expressions matching files which should be ignored by Elsa."
   :group 'flycheck-elsa
   :type '(repeat regexp))
