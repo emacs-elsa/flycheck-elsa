@@ -45,6 +45,11 @@
   :group 'flycheck-elsa
   :type '(repeat regexp))
 
+(defun flycheck-elsa--locate-cask-dir ()
+  "Return dir located Cask file.  If missing, return nil."
+  (when-let (file (locate-dominating-file (buffer-file-name) "Cask"))
+    (file-name-directory file)))
+
 (defun flycheck-elsa--enable-p ()
   "Return non-nil if we can enable Elsa in current buffer.
 
@@ -58,8 +63,7 @@ listed as a dependency."
 (defun flycheck-elsa--working-directory (&rest _)
   "Return the working directory where the checker should run."
   (if (buffer-file-name)
-      (when-let (file (locate-dominating-file (buffer-file-name) "Cask"))
-        (file-name-directory file))
+      (flycheck-elsa--locate-cask-dir)
     default-directory))
 
 (flycheck-define-checker emacs-lisp-elsa
