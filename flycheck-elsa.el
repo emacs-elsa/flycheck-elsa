@@ -55,10 +55,12 @@
 
 We require that the project is managed by Cask and that Elsa is
 listed as a dependency."
-  (and (buffer-file-name)
-       (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
-                      flycheck-elsa-ignored-files-regexps))
-       (= 0 (call-process "cask" nil nil nil "exec" "elsa" "-h"))))
+  (when-let (cask-dir (flycheck-elsa--locate-cask-dir))
+    (let ((default-directory cask-dir))
+      (and (buffer-file-name)
+           (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
+                          flycheck-elsa-ignored-files-regexps))
+           (= 0 (call-process "cask" nil nil nil "exec" "elsa" "-h"))))))
 
 (defun flycheck-elsa--working-directory (&rest _)
   "Return the working directory where the checker should run."
