@@ -50,6 +50,27 @@
   (when-let (file (locate-dominating-file (buffer-file-name) "Cask"))
     (file-name-directory file)))
 
+(defun flycheck-elsa--elsa-dependency-p ()
+  "Return non-nil if elsa listed in Cask file dependency."
+  (let ((cask-dir (flycheck-elsa--locate-cask-dir)))
+    (with-temp-buffer
+      (insert-file-contents (expand-file-name "Cask" cask-dir))
+      (let* ((contents (read (format "(%s)" (buffer-string))))
+             (deps (append
+                    (mapcan
+                     (lambda (elm)
+                       (and (eq 'depends-on (car elm)) (list elm))) contents)
+                    (mapcan
+                     (lambda (elm)
+                       (and (eq 'development (car elm))
+                            (mapcan
+                             (lambda (elm)
+                               (and (eq 'depends-on (car elm)) (list elm)))
+                             (cdr elm)))) contents))))
+        (and (delq 'nil (mapcar
+                         (lambda (elm) (string= "elsa" (nth 1 elm))) deps))
+             t)))))                     ; normarize return value
+
 (defun flycheck-elsa--enable-p ()
   "Return non-nil if we can enable Elsa in current buffer.
 
@@ -60,7 +81,11 @@ listed as a dependency."
       (and (buffer-file-name)
            (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
                           flycheck-elsa-ignored-files-regexps))
-           (= 0 (call-process "cask" nil nil nil "exec" "elsa" "-h"))))))
+           (and (flycheck-elsa--elsa-dependency-p)
+                (if (= 0 (call-process "cask" nil nil nil "exec" "elsa" "-h"))
+                    t
+                  (warn "Your Cask file have elsa dependency, but failed exec elsa")
+                  nil))))))
 
 (defun flycheck-elsa--working-directory (&rest _)
   "Return the working directory where the checker should run."
