@@ -6,7 +6,7 @@
 ;; Maintainer: Matúš Goljer <matus.goljer@gmail.com>
 ;; Version: 1.0.0
 ;; Created: 23rd August 2018
-;; Package-requires: ((emacs "25") (seq "2.0") (cask "0.8.4"))
+;; Package-requires: ((emacs "25") (seq "2.0"))
 ;; Keywords: convenience
 ;; Homepage: https://github.com/emacs-elsa/flycheck-elsa
 
@@ -30,7 +30,6 @@
 ;;; Code:
 
 (require 'flycheck)
-(require 'cask)
 (require 'seq)
 
 (defgroup flycheck-elsa nil
@@ -51,12 +50,10 @@
 
 We require that the project is managed by Cask and that Elsa is
 listed as a dependency."
-  (when (and (buffer-file-name)
-             (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
-                            flycheck-elsa-ignored-files-regexps)))
-    (when-let ((cask-file (locate-dominating-file (buffer-file-name) "Cask")))
-      (let ((bundle (cask-initialize (file-name-directory cask-file))))
-        (cask-find-dependency bundle 'elsa)))))
+  (and (buffer-file-name)
+       (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
+                      flycheck-elsa-ignored-files-regexps))
+       (= 0 (call-process "cask" nil nil nil "exec" "elsa" "-h"))))
 
 (defun flycheck-elsa--working-directory (&rest _)
   "Return the working directory where the checker should run."
