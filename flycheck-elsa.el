@@ -81,11 +81,7 @@ listed as a dependency."
       (and (buffer-file-name)
            (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
                           flycheck-elsa-ignored-files-regexps))
-           (and (flycheck-elsa--elsa-dependency-p)
-                (if (= 0 (call-process "cask" nil nil nil "exec" "elsa" "-h"))
-                    t
-                  (warn "Your Cask file have elsa dependency, but failed exec elsa")
-                  nil))))))
+           (flycheck-elsa--elsa-dependency-p)))))
 
 (defun flycheck-elsa--working-directory (&rest _)
   "Return the working directory where the checker should run."
