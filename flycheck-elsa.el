@@ -6,7 +6,7 @@
 ;; Maintainer: Matúš Goljer <matus.goljer@gmail.com>
 ;; Version: 1.0.0
 ;; Created: 23rd August 2018
-;; Package-requires: ((emacs "25") (seq "2.0") (cask "0.8.4"))
+;; Package-requires: ((emacs "25") (seq "2.0"))
 ;; Keywords: convenience
 ;; Homepage: https://github.com/emacs-elsa/flycheck-elsa
 
@@ -30,7 +30,6 @@
 ;;; Code:
 
 (require 'flycheck)
-(require 'cask)
 (require 'seq)
 
 (defgroup flycheck-elsa nil
@@ -46,23 +45,48 @@
   :group 'flycheck-elsa
   :type '(repeat regexp))
 
+(defun flycheck-elsa--locate-cask-dir ()
+  "Return dir located Cask file.  If missing, return nil."
+  (when-let (file (locate-dominating-file (buffer-file-name) "Cask"))
+    (file-name-directory file)))
+
+(defun flycheck-elsa--elsa-dependency-p ()
+  "Return non-nil if elsa listed in Cask file dependency."
+  (let ((cask-dir (flycheck-elsa--locate-cask-dir)))
+    (with-temp-buffer
+      (insert-file-contents (expand-file-name "Cask" cask-dir))
+      (let* ((contents (read (format "(%s)" (buffer-string))))
+             (deps (append
+                    (mapcan
+                     (lambda (elm)
+                       (and (eq 'depends-on (car elm)) (list elm))) contents)
+                    (mapcan
+                     (lambda (elm)
+                       (and (eq 'development (car elm))
+                            (mapcan
+                             (lambda (elm)
+                               (and (eq 'depends-on (car elm)) (list elm)))
+                             (cdr elm)))) contents))))
+        (and (delq 'nil (mapcar
+                         (lambda (elm) (string= "elsa" (nth 1 elm))) deps))
+             t)))))                     ; normarize return value
+
 (defun flycheck-elsa--enable-p ()
   "Return non-nil if we can enable Elsa in current buffer.
 
 We require that the project is managed by Cask and that Elsa is
 listed as a dependency."
-  (when (and (buffer-file-name)
-             (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
-                            flycheck-elsa-ignored-files-regexps)))
-    (when-let ((cask-file (locate-dominating-file (buffer-file-name) "Cask")))
-      (let ((bundle (cask-initialize (file-name-directory cask-file))))
-        (cask-find-dependency bundle 'elsa)))))
+  (when-let (cask-dir (flycheck-elsa--locate-cask-dir))
+    (let ((default-directory cask-dir))
+      (and (buffer-file-name)
+           (not (seq-find (lambda (f) (string-match-p f (buffer-file-name)))
+                          flycheck-elsa-ignored-files-regexps))
+           (flycheck-elsa--elsa-dependency-p)))))
 
 (defun flycheck-elsa--working-directory (&rest _)
   "Return the working directory where the checker should run."
   (if (buffer-file-name)
-      (when-let (file (locate-dominating-file (buffer-file-name) "Cask"))
-        (file-name-directory file))
+      (flycheck-elsa--locate-cask-dir)
     default-directory))
 
 (flycheck-define-checker emacs-lisp-elsa
