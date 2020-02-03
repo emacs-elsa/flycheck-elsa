@@ -47,7 +47,8 @@
 
 (defun flycheck-elsa--locate-cask-dir ()
   "Return dir located Cask file.  If missing, return nil."
-  (when-let (file (locate-dominating-file (buffer-file-name) "Cask"))
+  (when-let ((filename (buffer-file-name))
+             (file (locate-dominating-file filename "Cask")))
     (file-name-directory file)))
 
 (defun flycheck-elsa--elsa-dependency-p ()
