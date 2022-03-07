@@ -1,3 +1,5 @@
+[![MELPA](https://melpa.org/packages/flycheck-elsa-badge.svg)](https://melpa.org/#/flycheck-elsa)
+
 # flycheck-elsa - Flycheck for Elsa
 
 Integration of [Elsa](https://github.com/emacs-elsa/Elsa) into [Flycheck](https://github.com/flycheck/flycheck).
