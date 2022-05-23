@@ -92,7 +92,7 @@ listed as a dependency."
 
 (flycheck-define-checker emacs-lisp-elsa
   "An Emacs Lisp checker using Elsa"
-  :command ("cask" "exec" "elsa" source)
+  :command ("cask" "exec" "elsa" source-inplace)
   :working-directory flycheck-elsa--working-directory
   :predicate flycheck-elsa--enable-p
   :error-filter flycheck-increment-error-columns
