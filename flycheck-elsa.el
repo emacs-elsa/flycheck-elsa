@@ -98,8 +98,8 @@ listed as a dependency."
   :error-filter flycheck-increment-error-columns
   :error-patterns
   ((error line-start (file-name) ":"  line ":" column ":error:" (message (one-or-more not-newline) (* "\n" (one-or-more " ") (one-or-more not-newline))))
-   (warning line-start (file-name) ":" line ":" column ":warning:" (message))
-   (info line-start (file-name) ":" line ":" column ":notice:" (message)))
+   (warning line-start (file-name) ":" line ":" column ":warning:" (message (one-or-more not-newline) (* "\n" (one-or-more " ") (one-or-more not-newline))))
+   (info line-start (file-name) ":" line ":" column ":notice:" (message (one-or-more not-newline) (* "\n" (one-or-more " ") (one-or-more not-newline)))))
   :modes (emacs-lisp-mode))
 
 ;;;###autoload
