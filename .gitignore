@@ -1,2 +1,5 @@
 .cask/*
+.eask/*
 .elsa/*
+
+/dist
